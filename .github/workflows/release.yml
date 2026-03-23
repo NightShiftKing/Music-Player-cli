@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux-amd64
+            archive: tar.gz
+          - os: macos-latest
+            name: macos-amd64
+            archive: tar.gz
+          - os: windows-latest
+            name: windows-amd64
+            archive: zip
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Package (Linux/macOS)
+        if: matrix.archive == 'tar.gz'
+        run: |
+          mkdir -p dist
+          if [ -f build/music-player ]; then
+            cp build/music-player dist/
+          elif [ -f build/Release/music-player ]; then
+            cp build/Release/music-player dist/
+          fi
+          chmod +x dist/music-player
+          tar -czf music-player-${{ matrix.name }}.tar.gz -C dist music-player
+
+      - name: Package (Windows)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          $exe = Get-ChildItem -Path build -Recurse -Filter "music-player.exe" | Select-Object -First 1
+          Copy-Item $exe.FullName -Destination dist/
+          Compress-Archive -Path dist/music-player.exe -DestinationPath music-player-${{ matrix.name }}.zip
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            music-player-${{ matrix.name }}.${{ matrix.archive }}

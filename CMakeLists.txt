@@ -62,3 +62,6 @@ else()
     target_link_libraries(music-player PRIVATE
         Threads::Threads dl m)
 endif()
+
+# ── Install ────────────────────────────────────────────────
+install(TARGETS music-player DESTINATION bin)

@@ -9,6 +9,33 @@ A terminal user interface (TUI) audio player built in C++ using [FTXUI](https://
 - **Recursive directory scanning** — Automatically discovers all audio files in a folder and its subfolders
 - **Keyboard controls** — Play/pause, skip, volume, sort, and quit with simple key bindings
 
+## Installation
+
+### Homebrew (macOS / Linux)
+
+```bash
+brew tap NightShiftKing/tap
+brew install music-player-cli
+```
+
+### Quick Install Script (Linux / macOS)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/NightShiftKing/Music-Player-cli/main/install.sh | bash
+```
+
+This auto-detects your OS, downloads the latest binary, and installs it to `~/.local/bin`.
+
+### Manual Download
+
+Download the latest binary for your platform from the [Releases page](https://github.com/NightShiftKing/Music-Player-cli/releases):
+
+| Platform | File |
+|----------|------|
+| Linux | `music-player-linux-amd64.tar.gz` |
+| macOS | `music-player-macos-amd64.tar.gz` |
+| Windows | `music-player-windows-amd64.zip` |
+
 ## Prerequisites
 
 | Tool       | Minimum Version | Check Command      |
