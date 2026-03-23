@@ -98,4 +98,12 @@ src/
 - `.mp3` — MPEG Audio Layer 3
 - `.flac` — Free Lossless Audio Codec
 
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](file:///home/nightshiftking/Documents/Music-Player-cli/CONTRIBUTING.md) and the [Code of Conduct](file:///home/nightshiftking/Documents/Music-Player-cli/CODE_OF_CONDUCT.md) for details on how to get involved.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](file:///home/nightshiftking/Documents/Music-Player-cli/LICENSE) file for details.
+
 
