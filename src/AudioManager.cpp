@@ -129,6 +129,10 @@ bool AudioManager::getIsPlaying() const {
     return playing;
 }
 
+bool AudioManager::hasFinishedPlaying() const {
+    return soundLoaded && currentSound != nullptr && ma_sound_at_end(currentSound);
+}
+
 void AudioManager::cleanup() {
     if (soundLoaded && currentSound != nullptr) {
         ma_sound_uninit(currentSound);
