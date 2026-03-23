@@ -11,16 +11,18 @@
 #include "UIElement.h"
 #include "DoublyLinkedList.h"
 #include "SongNode.h"
+#include "PlaybackMode.h"
 #include <ftxui/dom/elements.hpp>
 
 class NowPlayingPanel : public UIElement {
 private:
     DoublyLinkedList<SongNode>* playlist;  // Non-owning pointer
+    PlaybackMode* currentMode;             // Non-owning pointer
     bool isPlaying;
 
 public:
-    NowPlayingPanel(DoublyLinkedList<SongNode>* pl)
-        : playlist(pl), isPlaying(false) {}
+    NowPlayingPanel(DoublyLinkedList<SongNode>* pl, PlaybackMode* mode)
+        : playlist(pl), currentMode(mode), isPlaying(false) {}
 
     void setPlaying(bool playing) { isPlaying = playing; }
 
@@ -37,6 +39,7 @@ public:
 
         SongNode& song = playlist->getCurrent();
         std::string status = isPlaying ? "▶  Playing" : "⏸  Paused";
+        std::string modeStr = currentMode ? playbackModeToString(*currentMode) : "";
 
         return window(text(" Now Playing ") | bold,
             vbox({
@@ -44,8 +47,12 @@ public:
                 text("  " + song.getArtist()) | dim,
                 text("  " + song.getAlbum()) | dim,
                 separator(),
-                text("  " + status)
-                    | (isPlaying ? color(Color::Green) : color(Color::Yellow)),
+                hbox({
+                    text("  " + status)
+                        | (isPlaying ? color(Color::Green) : color(Color::Yellow)),
+                    filler(),
+                    text(modeStr + "  ") | dim,
+                }),
             })
         );
     }

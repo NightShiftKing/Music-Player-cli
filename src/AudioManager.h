@@ -35,5 +35,6 @@ public:
     void setVolume(int level);
     int  getVolume() const;
     bool getIsPlaying() const;
+    bool hasFinishedPlaying() const;
     void cleanup();
 };
