@@ -1,12 +1,14 @@
+// ============================================================
+// File: AudioManager.h
+// Author: Michael Monreal
+// Description: Declares the AudioManager class which handles
+//              cross-platform audio playback using miniaudio.
+//              Supports WAV, MP3, FLAC, and Vorbis formats.
+//              Demonstrates: Encapsulation, Resource Management,
+//              Concurrency (audio streaming on a background thread).
+// ============================================================
 #pragma once
 #include <string>
-
-// ============================================================
-// AudioManager — Cross-platform audio playback via miniaudio.
-// Supports: WAV, MP3, FLAC, Vorbis on Windows, macOS, Linux.
-// Demonstrates: Encapsulation, Resource Management,
-//               Concurrency (audio decoding/streaming on its own thread)
-// ============================================================
 
 // Forward declarations (avoids exposing miniaudio.h in the header)
 struct ma_engine;

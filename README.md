@@ -64,18 +64,6 @@ src/
 └── PlayerApp.h/cpp       Main application, FTXUI component
 ```
 
-## CS Concepts Demonstrated
-
-| Concept | Implementation |
-|---------|---------------|
-| Abstract Classes | `UIElement` with pure virtual `render()`, `handleEvent()`, `getName()` |
-| Class Templates | `DoublyLinkedList<T>` — generic linked list |
-| Inheritance | `NowPlayingPanel` and `PlaylistPanel` extend `UIElement` |
-| Polymorphism | `PlayerApp` calls `render()`/`handleEvent()` via `UIElement*` pointers |
-| Operator Overloads | `<<`, `==`, `!=`, `<` on `SongNode`; `[]`, `<<` on `DoublyLinkedList` |
-| Sorting | Merge sort on doubly linked list — O(n log n) |
-| Data Structures | Doubly linked list implemented from scratch |
-| Recursion | `DirectoryCrawler::searchDirectory()` recurses into subdirectories |
 
 ## Supported Audio Formats
 
@@ -83,6 +71,4 @@ src/
 - `.mp3` — MPEG Audio Layer 3
 - `.flac` — Free Lossless Audio Codec
 
-## License
 
-This project was created as a capstone project for academic purposes.

@@ -1,3 +1,11 @@
+// ============================================================
+// File: main.cpp
+// Author: Michael Monreal
+// Description: Entry point for the TUI Music Player. Prompts
+//              the user for a music directory, uses the recursive
+//              DirectoryCrawler to find audio files (inserted in
+//              sorted order), then launches the interactive TUI.
+// ============================================================
 #include "DoublyLinkedList.h"
 #include "SongNode.h"
 #include "DirectoryCrawler.h"
@@ -36,7 +44,9 @@ int main(int argc, char* argv[]) {
     // ---- Build the player ----
     PlayerApp app;
 
-    // Use the recursive DirectoryCrawler to find audio files
+    // Use the recursive DirectoryCrawler to find audio files.
+    // Files are inserted in sorted order via insertSorted(),
+    // so no separate sort pass is needed.
     DirectoryCrawler crawler(&app.getPlaylist());
 
     std::cout << "Scanning '" << musicPath << "' for audio files...\n";
@@ -49,13 +59,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << "Found " << crawler.getFilesFound() << " audio file(s).\n";
+    std::cout << "Found " << crawler.getFilesFound()
+              << " audio file(s), sorted by title.\n";
 
-    // Sort the playlist alphabetically by title (Merge Sort)
-    std::cout << "Sorting playlist...\n";
-    app.getPlaylist().sort();   // << MERGE SORT happens here
-
-    // Print the playlist to stdout before launching TUI
+    // Print the sorted playlist to stdout before launching TUI
     std::cout << "\nPlaylist:\n" << app.getPlaylist() << std::endl;
 
     std::cout << "Launching player... (press Q to quit)\n";

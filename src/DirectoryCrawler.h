@@ -1,13 +1,18 @@
+// ============================================================
+// File: DirectoryCrawler.h
+// Author: Michael Monreal
+// Description: Declares the DirectoryCrawler class which
+//              recursively searches a directory tree for
+//              supported audio files and inserts them into
+//              a doubly linked list in sorted order.
+//              Demonstrates: Recursion.
+// ============================================================
 #pragma once
 #include "DoublyLinkedList.h"
 #include "SongNode.h"
 #include <string>
 #include <vector>
 
-// ============================================================
-// DirectoryCrawler — Recursively searches directories for audio.
-// Demonstrates: Recursion
-// ============================================================
 class DirectoryCrawler {
 private:
     DoublyLinkedList<SongNode>* masterLibrary;

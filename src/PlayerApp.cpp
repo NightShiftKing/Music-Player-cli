@@ -1,14 +1,22 @@
+// ============================================================
+// File: PlayerApp.cpp
+// Author: Michael Monreal
+// Description: Implements the PlayerApp class. Creates the
+//              FTXUI interactive component, composes UI panels
+//              using polymorphic UIElement pointers, and handles
+//              global keyboard controls for playback and volume.
+//              Demonstrates: Polymorphism (UIElement* dispatch).
+// ============================================================
 #include "PlayerApp.h"
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
-#include <iostream>
 
 PlayerApp::PlayerApp() {
     audioManager.initAudio();
 
     // Create UI panels — stored as UIElement* for polymorphism
-    auto nowPlaying   = std::make_unique<NowPlayingPanel>(&playlist);
+    auto nowPlaying    = std::make_unique<NowPlayingPanel>(&playlist);
     auto playlistPanel = std::make_unique<PlaylistPanel>(&playlist);
 
     // Keep raw convenience pointers before transferring ownership
@@ -30,7 +38,7 @@ DoublyLinkedList<SongNode>& PlayerApp::getPlaylist() {
 void PlayerApp::loadAndPlayCurrent() {
     if (!playlist.hasCurrent()) return;
     SongNode& song = playlist.getCurrent();
-    if (audioManager.loadAudio(song.filePath)) {
+    if (audioManager.loadAudio(song.getFilePath())) {
         audioManager.play();
         nowPlayingPtr->setPlaying(true);
     }
@@ -64,8 +72,7 @@ void PlayerApp::run() {
                 separator(),
                 text("  Space: Play/Pause    ↑↓: Navigate List") | dim,
                 text("  Enter: Select Song   ←→: Skip Track  ") | dim,
-                text("  S: Sort Playlist     +/-: Volume      ") | dim,
-                text("  Q: Quit                               ") | dim,
+                text("  +/-: Volume          Q: Quit          ") | dim,
             })
         );
 
@@ -104,12 +111,6 @@ void PlayerApp::run() {
                 for (int i = 0; i < idx; i++) playlist.traverseForward();
                 loadAndPlayCurrent();
             }
-            return true;
-        }
-
-        // Sort playlist by title (Merge Sort)
-        if (event == Event::Character('s') || event == Event::Character('S')) {
-            playlist.sort();
             return true;
         }
 

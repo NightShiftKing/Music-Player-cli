@@ -1,12 +1,16 @@
+// ============================================================
+// File: DoublyLinkedList.h
+// Author: Michael Monreal
+// Description: A class template implementing a doubly linked list
+//              from scratch. Supports sorted insertion, traversal,
+//              linear search, merge sort, and operator overloading.
+//              Demonstrates: Class Templates, Data Structures,
+//              Sorting, Searching, Operator Overloading ([], <<).
+// ============================================================
 #pragma once
 #include <iostream>
 #include <stdexcept>
 
-// ============================================================
-// DoublyLinkedList<T> — Generic doubly linked list.
-// Demonstrates: Class Templates, Data Structures (from scratch),
-//               Sorting (Merge Sort), Operator Overloading ([], <<)
-// ============================================================
 template <typename T>
 class DoublyLinkedList {
 private:
@@ -32,8 +36,11 @@ public:
     DoublyLinkedList();
     ~DoublyLinkedList();
 
-    // Insertion & removal
+    // Insertion
     void insertNode(const T& data);
+    void insertSorted(const T& data);  // Maintains sorted order on insert
+
+    // Removal
     void removeNode(const T& data);
 
     // Traversal
@@ -43,11 +50,15 @@ public:
     bool hasCurrent() const;
     void resetCurrent();
 
+    // Search
+    T* find(const T& target);  // Linear search
+
     // Info
     int getSize() const;
     bool isEmpty() const;
 
-    // Merge sort (public interface)
+    // Merge sort (kept as algorithm demonstration;
+    // sorted insertion is preferred per instructor guidance)
     void sort();
 
     // ---- Operator Overloads ----
@@ -86,7 +97,7 @@ DoublyLinkedList<T>::~DoublyLinkedList() {
     }
 }
 
-// ---- Insertion ----
+// ---- Unsorted Insertion (appends to tail) ----
 
 template <typename T>
 void DoublyLinkedList<T>::insertNode(const T& data) {
@@ -98,6 +109,47 @@ void DoublyLinkedList<T>::insertNode(const T& data) {
         newNode->prev = tail;
         tail = newNode;
     }
+    listSize++;
+}
+
+// ============================================================
+// SORTED INSERTION — walks the list to find the correct
+// position and inserts the node there, maintaining sorted
+// order. Uses operator< on T for comparison.
+// This avoids a separate sort pass over the entire list.
+// ============================================================
+template <typename T>
+void DoublyLinkedList<T>::insertSorted(const T& data) {
+    Node* newNode = new Node(data);
+
+    if (head == nullptr) {
+        // Empty list — new node becomes head, tail, and current
+        head = tail = current = newNode;
+    }
+    else if (data < head->data) {
+        // Insert at the beginning (before head)
+        newNode->next = head;
+        head->prev = newNode;
+        head = newNode;
+    }
+    else {
+        // Walk the list to find the correct sorted position
+        Node* temp = head;
+        while (temp->next != nullptr && temp->next->data < data) {
+            temp = temp->next;
+        }
+        // Insert after temp
+        newNode->next = temp->next;
+        newNode->prev = temp;
+        if (temp->next != nullptr) {
+            temp->next->prev = newNode;
+        } else {
+            tail = newNode;   // New node becomes the tail
+        }
+        temp->next = newNode;
+    }
+
+    if (current == nullptr) current = head;
     listSize++;
 }
 
@@ -172,6 +224,23 @@ bool DoublyLinkedList<T>::isEmpty() const {
 }
 
 // ============================================================
+// SEARCH — Linear search through the list.
+// Returns a pointer to the matching element, or nullptr if
+// not found. Uses operator== on T for comparison.
+// ============================================================
+template <typename T>
+T* DoublyLinkedList<T>::find(const T& target) {
+    Node* temp = head;
+    while (temp != nullptr) {
+        if (temp->data == target) {
+            return &(temp->data);
+        }
+        temp = temp->next;
+    }
+    return nullptr;  // Not found
+}
+
+// ============================================================
 // Operator Overloads
 // ============================================================
 
@@ -197,8 +266,11 @@ const T& DoublyLinkedList<T>::operator[](int index) const {
 }
 
 // ============================================================
-// Merge Sort — O(n log n), ideal for linked lists because
-// it does not require random access (unlike quicksort).
+// Merge Sort — O(n log n), demonstrates sorting algorithm.
+// Note: Per instructor guidance, sorted insertion via
+// insertSorted() is preferred for linked lists to avoid
+// hidden traversal overhead. This method is retained as
+// an algorithm demonstration.
 // ============================================================
 
 template <typename T>
@@ -233,7 +305,7 @@ typename DoublyLinkedList<T>::Node* DoublyLinkedList<T>::split(Node* start) {
     return second;
 }
 
-// mergeSort — recursively splits and merges (RECURSION + SORTING)
+// mergeSort — recursively splits and merges
 template <typename T>
 typename DoublyLinkedList<T>::Node* DoublyLinkedList<T>::mergeSort(Node* start) {
     if (start == nullptr || start->next == nullptr)

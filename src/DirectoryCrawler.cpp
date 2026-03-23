@@ -1,3 +1,12 @@
+// ============================================================
+// File: DirectoryCrawler.cpp
+// Author: Michael Monreal
+// Description: Implements the DirectoryCrawler class which uses
+//              recursion to walk a directory tree and discover
+//              all supported audio files. Found files are
+//              inserted into the playlist in sorted order.
+//              Demonstrates: Recursion.
+// ============================================================
 #include "DirectoryCrawler.h"
 #include <filesystem>
 #include <algorithm>
@@ -25,7 +34,8 @@ bool DirectoryCrawler::isSupportedFile(const std::string& extension) const {
 // RECURSION: Walks the directory tree. For each subdirectory
 // found, searchDirectory calls itself (recursive call).
 // For each supported audio file found, a SongNode is created
-// and inserted into the master library (doubly linked list).
+// and inserted into the master library in sorted order using
+// insertSorted() to maintain alphabetical ordering.
 // ============================================================
 void DirectoryCrawler::searchDirectory(const std::string& path) {
     try {
@@ -43,7 +53,8 @@ void DirectoryCrawler::searchDirectory(const std::string& path) {
                                                .filename().string();
 
                     SongNode song(filePath, title, "Unknown Artist", album);
-                    masterLibrary->insertNode(song);
+                    // Insert in sorted order (no separate sort needed)
+                    masterLibrary->insertSorted(song);
                 }
             }
         }

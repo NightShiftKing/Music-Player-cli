@@ -1,17 +1,16 @@
+// ============================================================
+// File: UIElement.h
+// Author: Michael Monreal
+// Description: Abstract base class for all UI panels in the
+//              TUI music player. Defines a common interface
+//              with pure virtual methods that derived classes
+//              must implement. Demonstrates: Abstract Classes.
+// ============================================================
 #pragma once
 #include <string>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/component/event.hpp>
 
-// ============================================================
-// UIElement — Abstract base class for all UI panels.
-// Demonstrates: Abstract Classes, Polymorphism
-//
-// Any class inheriting UIElement MUST implement:
-//   - render()      : returns an ftxui::Element for display
-//   - handleEvent() : processes keyboard/mouse input
-//   - getName()     : returns the panel's display name
-// ============================================================
 class UIElement {
 public:
     virtual ~UIElement() = default;

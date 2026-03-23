@@ -1,14 +1,18 @@
+// ============================================================
+// File: NowPlayingPanel.h
+// Author: Michael Monreal
+// Description: Concrete UI panel that displays the currently
+//              playing song's metadata and playback state.
+//              Inherits from UIElement and overrides render(),
+//              handleEvent(), and getName().
+//              Demonstrates: Inheritance, Polymorphism.
+// ============================================================
 #pragma once
 #include "UIElement.h"
 #include "DoublyLinkedList.h"
 #include "SongNode.h"
 #include <ftxui/dom/elements.hpp>
 
-// ============================================================
-// NowPlayingPanel — Displays the currently playing song.
-// Demonstrates: Inheritance (from UIElement),
-//               Polymorphism (overrides render, handleEvent, getName)
-// ============================================================
 class NowPlayingPanel : public UIElement {
 private:
     DoublyLinkedList<SongNode>* playlist;  // Non-owning pointer
@@ -36,9 +40,9 @@ public:
 
         return window(text(" Now Playing ") | bold,
             vbox({
-                text("  " + song.title) | bold,
-                text("  " + song.artist) | dim,
-                text("  " + song.album) | dim,
+                text("  " + song.getTitle()) | bold,
+                text("  " + song.getArtist()) | dim,
+                text("  " + song.getAlbum()) | dim,
                 separator(),
                 text("  " + status)
                     | (isPlaying ? color(Color::Green) : color(Color::Yellow)),

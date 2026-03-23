@@ -1,5 +1,15 @@
-// We define the implementation here — miniaudio is a single-header library.
-// This must appear in exactly ONE .cpp file.
+// ============================================================
+// File: AudioManager.cpp
+// Author: Michael Monreal
+// Description: Implements the AudioManager class using the
+//              miniaudio library for cross-platform audio
+//              playback. Handles engine initialization, sound
+//              loading, play/pause control, and volume.
+//              Demonstrates: Encapsulation, Resource Management.
+// ============================================================
+
+// miniaudio is a single-header library; the implementation
+// must appear in exactly ONE .cpp file.
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
@@ -113,7 +123,6 @@ bool AudioManager::getIsPlaying() const {
     // Check if the sound has finished playing naturally
     if (playing && soundLoaded && currentSound != nullptr) {
         if (!ma_sound_is_playing(currentSound)) {
-            // Sound finished — cast away const for state update
             const_cast<AudioManager*>(this)->playing = false;
         }
     }

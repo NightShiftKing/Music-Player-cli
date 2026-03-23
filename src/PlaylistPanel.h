@@ -1,3 +1,12 @@
+// ============================================================
+// File: PlaylistPanel.h
+// Author: Michael Monreal
+// Description: Concrete UI panel that displays the song list
+//              with arrow-key navigation and selection.
+//              Inherits from UIElement and overrides render(),
+//              handleEvent(), and getName().
+//              Demonstrates: Inheritance, Polymorphism.
+// ============================================================
 #pragma once
 #include "UIElement.h"
 #include "DoublyLinkedList.h"
@@ -5,11 +14,6 @@
 #include <vector>
 #include <ftxui/dom/elements.hpp>
 
-// ============================================================
-// PlaylistPanel — Displays the song list with arrow-key navigation.
-// Demonstrates: Inheritance (from UIElement),
-//               Polymorphism (overrides render, handleEvent, getName)
-// ============================================================
 class PlaylistPanel : public UIElement {
 private:
     DoublyLinkedList<SongNode>* playlist;  // Non-owning pointer
@@ -38,7 +42,7 @@ public:
             SongNode& song = (*playlist)[i];
 
             std::string prefix = (i == selectedIndex) ? " ▸ " : "   ";
-            auto entry = text(prefix + song.title + " - " + song.artist);
+            auto entry = text(prefix + song.getTitle() + " - " + song.getArtist());
 
             if (i == selectedIndex) {
                 entry = entry | bold | color(Color::Cyan);

@@ -1,3 +1,12 @@
+// ============================================================
+// File: PlayerApp.h
+// Author: Michael Monreal
+// Description: Declares the PlayerApp class which serves as
+//              the main application. Owns the playlist, audio
+//              manager, and UI panels. Composes all components
+//              into an interactive FTXUI terminal interface.
+//              Demonstrates: Composition, Polymorphism.
+// ============================================================
 #pragma once
 #include "DoublyLinkedList.h"
 #include "SongNode.h"
@@ -8,10 +17,6 @@
 #include <vector>
 #include <memory>
 
-// ============================================================
-// PlayerApp — Main application, ties all components together.
-// Demonstrates: Composition, Polymorphism (UIElement* dispatch)
-// ============================================================
 class PlayerApp {
 private:
     DoublyLinkedList<SongNode> playlist;
