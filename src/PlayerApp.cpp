@@ -12,11 +12,23 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 
-PlayerApp::PlayerApp() {
+#include "PlayerApp.h"
+#include <ftxui/component/component.hpp>
+#include <ftxui/component/screen_interactive.hpp>
+#include <ftxui/dom/elements.hpp>
+#include <algorithm>
+#include <random>
+
+PlayerApp::PlayerApp() 
+    : playbackMode(PlaybackMode::Sequential), shuffleIndex(-1) {
     audioManager.initAudio();
 
+    // Seed RNG
+    std::random_device rd;
+    rng.seed(rd());
+
     // Create UI panels — stored as UIElement* for polymorphism
-    auto nowPlaying    = std::make_unique<NowPlayingPanel>(&playlist);
+    auto nowPlaying    = std::make_unique<NowPlayingPanel>(&playlist, &playbackMode);
     auto playlistPanel = std::make_unique<PlaylistPanel>(&playlist);
 
     // Keep raw convenience pointers before transferring ownership
@@ -35,6 +47,87 @@ DoublyLinkedList<SongNode>& PlayerApp::getPlaylist() {
     return playlist;
 }
 
+void PlayerApp::cyclePlaybackMode() {
+    playbackMode = nextPlaybackMode(playbackMode);
+    if (playbackMode == PlaybackMode::Shuffle) {
+        buildShuffleOrder();
+    }
+}
+
+PlaybackMode PlayerApp::getPlaybackMode() const {
+    return playbackMode;
+}
+
+void PlayerApp::buildShuffleOrder() {
+    shuffleOrder.clear();
+    int size = playlist.getSize();
+    for (int i = 0; i < size; ++i) {
+        shuffleOrder.push_back(i);
+    }
+    std::shuffle(shuffleOrder.begin(), shuffleOrder.end(), rng);
+    shuffleIndex = 0;
+}
+
+void PlayerApp::advanceTrack() {
+    if (playlist.isEmpty()) return;
+
+    switch (playbackMode) {
+        case PlaybackMode::Sequential:
+            try {
+                playlist.traverseForward();
+                loadAndPlayCurrent();
+            } catch (...) {
+                // At the end of sequential, just stop
+                audioManager.pause();
+                nowPlayingPtr->setPlaying(false);
+            }
+            break;
+
+        case PlaybackMode::RepeatOne:
+            loadAndPlayCurrent();
+            break;
+
+        case PlaybackMode::RepeatAll:
+            try {
+                // If at the last node, wrap around to head
+                // DoublyLinkedList::traverseForward() might throw at end or just stay at tail
+                // Let's check if we're at tail manually or catch. 
+                // Based on implementation, traverseForward doesn't wrap.
+                int currentIdx = playlistPtr->getSelectedIndex();
+                if (currentIdx == playlist.getSize() - 1) {
+                    playlist.resetCurrent();
+                } else {
+                    playlist.traverseForward();
+                }
+                loadAndPlayCurrent();
+            } catch (...) {
+                playlist.resetCurrent();
+                loadAndPlayCurrent();
+            }
+            break;
+
+        case PlaybackMode::Shuffle:
+            if (shuffleOrder.empty()) buildShuffleOrder();
+            shuffleIndex++;
+            if (shuffleIndex >= static_cast<int>(shuffleOrder.size())) {
+                buildShuffleOrder();
+            }
+            
+            playlist.resetCurrent();
+            for (int i = 0; i < shuffleOrder[shuffleIndex]; ++i) {
+                playlist.traverseForward();
+            }
+            loadAndPlayCurrent();
+            break;
+    }
+}
+
+void PlayerApp::onTrackFinished() {
+    if (audioManager.hasFinishedPlaying()) {
+        advanceTrack();
+    }
+}
+
 void PlayerApp::loadAndPlayCurrent() {
     if (!playlist.hasCurrent()) return;
     SongNode& song = playlist.getCurrent();
@@ -51,6 +144,9 @@ void PlayerApp::run() {
 
     // Build the FTXUI component
     auto component = CatchEvent(Renderer([&] {
+        // ---- POLLING FOR TRACK END ----
+        onTrackFinished();
+
         // ---- POLYMORPHISM IN ACTION ----
         // Each panel is rendered through the UIElement* interface.
         // The correct render() override is called based on object type.
@@ -72,7 +168,8 @@ void PlayerApp::run() {
                 separator(),
                 text("  Space: Play/Pause    ↑↓: Navigate List") | dim,
                 text("  Enter: Select Song   ←→: Skip Track  ") | dim,
-                text("  +/-: Volume          Q: Quit          ") | dim,
+                text("  +/-: Volume          M: Cycle Mode    ") | dim,
+                text("  Q: Quit") | dim,
             })
         );
 
@@ -109,8 +206,17 @@ void PlayerApp::run() {
                 int idx = playlistPtr->getSelectedIndex();
                 playlist.resetCurrent();
                 for (int i = 0; i < idx; i++) playlist.traverseForward();
+                
+                // If in shuffle mode, reset shuffle index to this song if it's in the order
+                // or just keep it as is. Simplifying: just play.
                 loadAndPlayCurrent();
             }
+            return true;
+        }
+
+        // Cycle Mode
+        if (event == Event::Character('m') || event == Event::Character('M')) {
+            cyclePlaybackMode();
             return true;
         }
 
@@ -128,10 +234,7 @@ void PlayerApp::run() {
 
         // Skip forward
         if (event == Event::ArrowRight) {
-            if (!playlist.isEmpty()) {
-                playlist.traverseForward();
-                loadAndPlayCurrent();
-            }
+            advanceTrack();
             return true;
         }
 
@@ -153,5 +256,16 @@ void PlayerApp::run() {
         return false;
     });
 
+    std::atomic<bool> refresh_ui = true;
+    std::thread refresh_thread([&] {
+        while (refresh_ui) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            screen.PostEvent(Event::Custom);
+        }
+    });
+
     screen.Loop(component);
+    
+    refresh_ui = false;
+    refresh_thread.join();
 }
